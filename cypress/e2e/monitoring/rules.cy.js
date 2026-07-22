@@ -126,11 +126,15 @@ describe('Rules Management Flow', { pageLoadTimeout: 120000 }, () => {
       .should('be.visible')
       .click({ force: true });
 
-    cy.get('.p-dialog input:visible').first().as('ruleNameInput');
+    cy.get('div.p-dialog:visible', { timeout: 25000 })
+      .should('exist')
+      .as('ruleDialog');
+
+    cy.get('@ruleDialog').find('input:visible').first().as('ruleNameInput');
     cy.get('@ruleNameInput')
       .should('be.visible')
       .clear({ force: true })
-      .type(ruleName, { delay: 50, force: true });
+      .type(ruleName, { delay: 80, force: true });
     cy.get('@ruleNameInput').should('have.value', ruleName);
 
     cy.contains(/Выберите действие|Выбрать действие|Choose action|Action/i, { timeout: 20000 })
@@ -145,22 +149,27 @@ describe('Rules Management Flow', { pageLoadTimeout: 120000 }, () => {
       .should('be.visible')
       .click({ force: true });
 
-    cy.get('div.rule-field-multi-select_body button.rule-field-multi-select__add-btn, button.rule-field-multi-select__add-btn', { timeout: 20000 })
-      .first()
+    // Add provider in the action block
+    cy.get('@ruleDialog')
+      .find('div.rule-field-multi-select')
+      .eq(0)
+      .find('button.rule-field-multi-select__add-btn', { timeout: 20000 })
       .scrollIntoView({ offset: { top: -100, left: 0 } })
       .should('be.visible')
       .click({ force: true });
 
     cy.wait(700);
-    cy.get('input.p-autocomplete-input', { timeout: 20000 })
-      .last()
+    cy.get('@ruleDialog')
+      .find('div.rule-field-multi-select')
+      .eq(0)
+      .find('input.p-autocomplete-input', { timeout: 20000 })
+      .first()
       .should('be.visible')
       .click({ force: true })
       .clear({ force: true })
       .type('AutoTestForRule', { delay: 50, force: true });
 
     cy.wait(900);
-
     cy.contains('li.p-autocomplete-item, .p-autocomplete-item, [role="option"]', /AutoTestForRule/i, { timeout: 20000 })
       .should('be.visible')
       .click({ force: true });
@@ -177,19 +186,26 @@ describe('Rules Management Flow', { pageLoadTimeout: 120000 }, () => {
       .should('be.visible')
       .click({ force: true });
 
-    cy.get('div.rule-field-multi-select').last()
+    // Add provider in the condition block
+    cy.get('@ruleDialog')
+      .find('div.rule-field-multi-select')
+      .eq(1)
       .find('button.rule-field-multi-select__add-btn', { timeout: 20000 })
       .scrollIntoView({ offset: { top: -100, left: 0 } })
       .should('be.visible')
       .click({ force: true });
 
-    cy.get('div.rule-field-multi-select').last()
+    cy.get('@ruleDialog')
+      .find('div.rule-field-multi-select')
+      .eq(1)
       .find('input.p-autocomplete-input', { timeout: 20000 })
+      .first()
       .should('be.visible')
       .click({ force: true })
       .clear({ force: true })
       .type('AutoTestForRule', { delay: 50, force: true });
 
+    cy.wait(900);
     cy.contains('li.p-autocomplete-item, .p-autocomplete-item, [role="option"]', /AutoTestForRule/i, { timeout: 20000 })
       .should('be.visible')
       .click({ force: true });
