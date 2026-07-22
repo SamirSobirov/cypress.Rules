@@ -140,6 +140,7 @@ describe('Rules Management Flow', { pageLoadTimeout: 120000 }, () => {
         cy.wrap(clickable).click({ force: true });
       });
 
+    cy.wait(700);
     cy.contains('button, [role="button"], .p-dropdown-item, [role="option"]', /Отключить провайдера|Disable provider/i)
       .should('be.visible')
       .click({ force: true });
@@ -150,11 +151,15 @@ describe('Rules Management Flow', { pageLoadTimeout: 120000 }, () => {
       .should('be.visible')
       .click({ force: true });
 
+    cy.wait(700);
     cy.get('input.p-autocomplete-input', { timeout: 20000 })
       .last()
       .should('be.visible')
       .click({ force: true })
+      .clear({ force: true })
       .type('AutoTestForRule', { delay: 50, force: true });
+
+    cy.wait(900);
 
     cy.contains('li.p-autocomplete-item, .p-autocomplete-item, [role="option"]', /AutoTestForRule/i, { timeout: 20000 })
       .should('be.visible')
