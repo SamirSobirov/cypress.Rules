@@ -88,6 +88,7 @@ describe('Rules Management Flow', { pageLoadTimeout: 120000 }, () => {
       .should('be.visible')
       .click({ force: true });
 
+    cy.wait(900);
     cy.log('🟢 ШАГ 3: ОТКРЫТИЕ ПАПКИ И СОЗДАНИЕ ПОДПАПКИ');
     cy.contains('button', folderName, { timeout: 20000 })
       .should('be.visible')
@@ -109,6 +110,7 @@ describe('Rules Management Flow', { pageLoadTimeout: 120000 }, () => {
       .should('be.visible')
       .click({ force: true });
 
+    cy.wait(900);
     cy.log('🟢 ШАГ 4: ВЫБОР ПОДПАПКИ И СОЗДАНИЕ ПРАВИЛА');
     cy.contains('button.subfolder-item', subfolderName, { timeout: 20000 })
       .should('be.visible')
@@ -119,6 +121,7 @@ describe('Rules Management Flow', { pageLoadTimeout: 120000 }, () => {
       .should('be.visible')
       .click({ force: true });
 
+    cy.wait(900);
     cy.contains('a.p-menu-item-link', /Поиск|Search/i, { timeout: 20000 })
       .should('be.visible')
       .click({ force: true });
@@ -192,6 +195,7 @@ describe('Rules Management Flow', { pageLoadTimeout: 120000 }, () => {
       .should('be.visible')
       .click({ force: true });
 
+    cy.wait(1100);
     cy.contains(ruleName, { timeout: 20000 }).should('exist');
 
     cy.log('🟢 ШАГ 5: УДАЛЕНИЕ ПРАВИЛА');
