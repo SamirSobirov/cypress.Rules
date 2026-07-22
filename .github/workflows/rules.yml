@@ -1,0 +1,60 @@
+name: Rules Management
+
+on:
+  schedule:
+    - cron: '0 */2 * * *'
+  workflow_dispatch:
+    inputs:
+      user_chat_id:
+        description: 'ID чата для the Telegram notification'
+        required: false
+        default: ''
+
+jobs:
+  rules-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Cypress test for rules
+        id: cypress
+        uses: cypress-io/github-action@v6
+        with:
+          spec: cypress/e2e/monitoring/rules.cy.js
+          browser: chrome
+        env:
+          CYPRESS_LOGIN_EMAIL: ${{ secrets.LOGIN_EMAIL }}
+          CYPRESS_LOGIN_PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
+
+      - name: Upload Cypress screenshots and videos
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-artifacts
+          path: |
+            cypress/screenshots/
+            cypress/videos/
+          if-no-files-found: ignore
+
+      - name: Send Telegram notification
+        if: always()
+        uses: appleboy/telegram-action@master
+        with:
+          to: >-
+            ${{ (github.event.inputs.user_chat_id != '') && github.event.inputs.user_chat_id || secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          format: markdown
+          message: |
+            ${{ github.event_name == 'schedule' && '📢 **Scheduled Rules Monitoring**' || '👤 **Manual Rules Test**' }}
+
+            📂 **Module:** Rules Management
+            📊 **Result:** ${{ steps.cypress.outcome == 'success' && '🟢 Success' || '🔴 Failed' }}
+
+            **Flow Steps:**
+            1. Create folder
+            2. Create subfolder
+            3. Create rule
+            4. Delete rule
+            5. Delete folder
