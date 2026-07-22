@@ -28,7 +28,36 @@ jobs:
           CYPRESS_LOGIN_EMAIL: ${{ secrets.LOGIN_EMAIL }}
           CYPRESS_LOGIN_PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
 
-      - name: Upload Cypress screenshots and videos
+      - name: Parse diagnostic data
+        if: always()
+        run: |
+          if [ -f auth_api_status.txt ]; then
+            RESULT=$(cat auth_api_status.txt | tr -d '[:space:]')
+          else
+            RESULT="UNKNOWN"
+          fi
+
+          S1="⏳"; S2="⏳"; S3="⏳"; S4="⏳"; S5="⏳"; STATUS="🔴 Failed"
+
+          case "$RESULT" in
+            "0") S1="❌"; STATUS="❌ UI Crash at Auth" ;;
+            "1") S1="✅"; S2="❌"; STATUS="⚠️ Failed at Create folder" ;;
+            "2") S1="✅"; S2="✅"; S3="❌"; STATUS="⚠️ Failed at Create subfolder" ;;
+            "3") S1="✅"; S2="✅"; S3="✅"; S4="❌"; STATUS="⚠️ Failed at Create rule" ;;
+            "4") S1="✅"; S2="✅"; S3="✅"; S4="✅"; S5="❌"; STATUS="⚠️ Failed at Delete rule" ;;
+            "5") S1="✅"; S2="✅"; S3="✅"; S4="✅"; S5="✅"; STATUS="🟢 Success" ;;
+            ERROR_*) S1="🆘 ${RESULT}"; STATUS="🔴 Auth API Error" ;;
+            *) STATUS="❌ Unknown Failure / File Missing" ;;
+          esac
+
+          echo "S1=$S1" >> $GITHUB_ENV
+          echo "S2=$S2" >> $GITHUB_ENV
+          echo "S3=$S3" >> $GITHUB_ENV
+          echo "S4=$S4" >> $GITHUB_ENV
+          echo "S5=$S5" >> $GITHUB_ENV
+          echo "FINAL_STATUS=$STATUS" >> $GITHUB_ENV
+
+      - name: Upload Cypress screenshots & videos
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -47,14 +76,14 @@ jobs:
           token: ${{ secrets.TELEGRAM_TOKEN }}
           format: markdown
           message: |
-            ${{ github.event_name == 'schedule' && '📢 **Scheduled Rules Monitoring**' || '👤 **Manual Rules Test**' }}
+            ${{ github.event_name == 'schedule' && '📢 **Hourly Rules Monitoring**' || '👤 **Manual Rules Test**' }}
 
             📂 **Module:** Rules Management
-            📊 **Result:** ${{ steps.cypress.outcome == 'success' && '🟢 Success' || '🔴 Failed' }}
+            📊 **Status:** ${{ env.FINAL_STATUS }}
 
             **Flow Steps:**
-            1. Create folder
-            2. Create subfolder
-            3. Create rule
-            4. Delete rule
-            5. Delete folder
+            1. Create folder: ${{ env.S1 }}
+            2. Create subfolder: ${{ env.S2 }}
+            3. Create rule: ${{ env.S3 }}
+            4. Delete rule: ${{ env.S4 }}
+            5. Delete folder: ${{ env.S5 }}
