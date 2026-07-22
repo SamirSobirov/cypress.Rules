@@ -1,4 +1,4 @@
-name: Rules Management
+name: Rules Monitoring
 
 on:
   schedule:
