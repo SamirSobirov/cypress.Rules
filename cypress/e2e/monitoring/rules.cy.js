@@ -251,5 +251,8 @@ describe('Rules Management Flow', { pageLoadTimeout: 120000 }, () => {
       .click({ force: true });
 
     cy.contains(folderName).should('not.exist');
+
+    // Успешный результат: отметка полного прохождения сценария
+    cy.writeFile('auth_api_status.txt', '5');
   });
 });
