@@ -2,7 +2,7 @@ name: Rules Monitoring
 
 on:
   schedule:
-    - cron: '0 */5 * * *'
+    - cron: '0 */6 * * *'
   workflow_dispatch:
     inputs:
       user_chat_id:
@@ -78,7 +78,7 @@ jobs:
           message: |
             ${{ github.event_name == 'schedule' && '📢 **Hourly Rules Monitoring**' || '👤 **Manual Rules Test**' }}
 
-            📂 **Module:** Rules Management
+            📂 **Module:** B2B Rules Monitoring
             📊 **Status:** ${{ env.FINAL_STATUS }}
 
             **Flow Steps:**
